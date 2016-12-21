@@ -1,11 +1,17 @@
 package com.example.insky.finalproject;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,8 +27,7 @@ public class UserinfoActivity extends AppCompatActivity {
     final int DIALOG_SLEEP = 1;
     final int DIALOG_COUNTTIME = 2;
     private static final int DIALOG_YES_NO_MESSAGE = 3; // 대화상자박스 실행을 위한 변수 선언
-    public static long hourToMinute;
-
+    public long hourToMinute;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +55,7 @@ public class UserinfoActivity extends AppCompatActivity {
             }
         }); */
     }
+
 
     public void onClick(View v) {
         switch (v.getId()) {
@@ -120,6 +126,4 @@ public class UserinfoActivity extends AppCompatActivity {
 
         return super.onCreateDialog(id);
     }
-
-
 }

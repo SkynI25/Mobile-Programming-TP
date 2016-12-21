@@ -3,18 +3,6 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/info_text"
-        android:text="사용자 정보 : "
-        android:textSize="10pt"/>
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:padding="1pt"
-        android:layout_below="@id/info_text"
-        android:id="@+id/edittext01"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -3,6 +3,11 @@
     package="com.example.insky.finalproject">
     
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <action android:name="android.intent.action.MAIN" />
     <application
@@ -23,6 +28,6 @@
         </activity>
         <activity android:name=".UserinfoActivity">
         </activity>
+        <service android:name=".AlarmMessageService" android:enabled="true"></service>
     </application>
-
 </manifest>
