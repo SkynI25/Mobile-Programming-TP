@@ -12,12 +12,25 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="입력한 수면 시간 : "
+        android:text="입력한 수면 시작시간 : "
         android:textSize="10pt"
-        android:id="@+id/sleeptime"/>
+        android:id="@+id/sleeptimeST"/>
     <TextView
-        android:layout_below="@id/sleeptime"
-        android:id="@+id/sleepValue"
+        android:layout_below="@id/sleeptimeST"
+        android:id="@+id/sleepValueST"
+        android:layout_width="match_parent"
+        android:layout_height="20pt" />
+
+    <TextView
+        android:layout_below="@id/sleepValueST"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="입력한 수면 종료시간 : "
+        android:textSize="10pt"
+        android:id="@+id/sleeptimeED"/>
+    <TextView
+        android:layout_below="@id/sleeptimeED"
+        android:id="@+id/sleepValueED"
         android:layout_width="match_parent"
         android:layout_height="20pt" />
 
@@ -27,7 +40,7 @@
         android:id="@+id/counttime"
         android:text="입력한 보호시간 : "
         android:textSize="10pt"
-        android:layout_below="@+id/sleepValue" />
+        android:layout_below="@+id/sleepValueED" />
 
     <TextView
         android:id="@+id/countValue"
@@ -35,19 +48,6 @@
         android:layout_height="20pt"
         android:layout_below="@id/counttime" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="보호자 : "
-        android:textSize="10pt"
-        android:id="@+id/saver"
-        android:layout_below="@+id/countValue" />
-
-    <TextView
-        android:id="@+id/inputSaver"
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:layout_below="@+id/saver" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -55,7 +55,7 @@
         android:text="보호자 번호 : "
         android:textSize="10pt"
         android:id="@+id/number"
-        android:layout_below="@id/inputSaver"/>
+        android:layout_below="@id/countValue"/>
 
     <TextView
         android:id="@+id/saverNumber"

@@ -13,29 +13,22 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/info_relation"
-        android:textSize="10pt"
-        android:text="보호자 : " />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:padding="1pt"
-        android:layout_below="@id/info_relation"
-        android:id="@+id/edittext01"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/info_number"
-        android:layout_below="@id/edittext01"
         android:textSize="10pt"
         android:inputType="number"
         android:text="보호자 번호 : " />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="20pt"
-        android:padding="1pt"
-        android:layout_below="@id/info_number"
-        android:id="@+id/edittext02"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="나가기"
+        android:id="@+id/cancel"
+        android:onClick="onClick"
+        android:layout_marginLeft="10pt"
+        android:layout_marginRight="10pt"
+        android:layout_alignBaseline="@+id/submit"
+        android:layout_alignBottom="@+id/submit"
+        android:layout_toEndOf="@+id/submit" />
 
     <Button
         android:layout_width="wrap_content"
@@ -45,20 +38,16 @@
         android:onClick="onClick"
         android:layout_marginLeft="10pt"
         android:layout_marginRight="10pt"
-        android:layout_marginTop="51dp"
-        android:layout_marginStart="23dp"
-        android:layout_below="@+id/edittext02"
+        android:layout_marginTop="36dp"
+        android:layout_below="@+id/edittext01"
         android:layout_alignParentStart="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="취소"
-        android:id="@+id/cancel"
-        android:onClick="onClick"
-        android:layout_marginLeft="10pt"
-        android:layout_marginRight="10pt"
-        android:layout_alignBaseline="@+id/submit"
-        android:layout_alignBottom="@+id/submit"
-        android:layout_toEndOf="@+id/submit" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="20pt"
+        android:padding="1pt"
+        android:id="@+id/edittext01"
+        android:inputType="number"
+        android:layout_below="@+id/info_number"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

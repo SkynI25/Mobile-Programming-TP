@@ -6,10 +6,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="수면시간설정"
+        android:text="수면시작시간설정"
         android:onClick="onClick"
         android:textSize="10pt"
-        android:id="@+id/sleep"/>
+        android:id="@+id/sleepStart"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="수면종료시간설정"
+        android:onClick="onClick"
+        android:textSize="10pt"
+        android:id="@+id/sleepEnd"/>
 
     <Button
         android:layout_width="wrap_content"

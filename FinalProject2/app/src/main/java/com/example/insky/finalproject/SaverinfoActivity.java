@@ -16,15 +16,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static android.R.attr.data;
-
 /**
  * Created by InSky on 2016-12-14.
  */
 
 public class SaverinfoActivity extends AppCompatActivity {
     EditText et1;
-    EditText et2;
     String fileName = "saverInfo.txt";
     private static final int DIALOG_YES_NO_MESSAGE = 1; // 대화상자박스 실행을 위한 변수 선언
     public String SaverNumber;
@@ -33,11 +30,10 @@ public class SaverinfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saver);
         et1 = (EditText) findViewById(R.id.edittext01);
-        et2 = (EditText) findViewById(R.id.edittext02);
 
         Intent in = getIntent();
         SaverNumber = in.getStringExtra("SaverNumber");
-        et2.setText(SaverNumber);
+        et1.setText(SaverNumber);
 
     }
 
@@ -45,22 +41,14 @@ public class SaverinfoActivity extends AppCompatActivity {
         switch (v.getId()) {
             case R.id.submit: {
                 if (et1.getText().toString().equals("") || et1.getText().toString().trim().equals("")) {
-                    Toast.makeText(this, "보호자를 입력해주세요", Toast.LENGTH_SHORT).show();
-                } else if (et2.getText().toString().equals("") || et2.getText().toString().trim().equals("")) {
                     Toast.makeText(this, "보호자의 번호를 입력해주세요", Toast.LENGTH_SHORT).show();
                 } else {
-                    Intent intent = new Intent();
-                    String number = et2.getText().toString();
-                    save(number);
-                    intent.putExtra("saver", et1.getText().toString());
-                    intent.putExtra("number", et2.getText().toString());
-                    setResult(RESULT_OK, intent);
-                    Toast.makeText(this, "저장하였습니다", Toast.LENGTH_SHORT).show();
+                    showDialog(DIALOG_YES_NO_MESSAGE);
                 }
                 break;
             }
             case R.id.cancel: {
-                showDialog(DIALOG_YES_NO_MESSAGE);
+                finish(); // 종료
                 break;
             }
         }
@@ -83,8 +71,15 @@ public class SaverinfoActivity extends AppCompatActivity {
                         .setNegativeButton("예", new DialogInterface.OnClickListener() { // 예를 누를 경우
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.d("Dialog", "Cancel");
-                                finish(); // 종료
+                                Intent intent = new Intent();
+                                String number = et1.getText().toString();
+                                save(number);
+                                //intent.putExtra("saver", et1.getText().toString());
+                                intent.putExtra("number", et1.getText().toString());
+                                setResult(RESULT_OK, intent);
+                                Toast.makeText(SaverinfoActivity.this, "저장하였습니다", Toast.LENGTH_SHORT).show();
+                                Log.d("Dialog", "Okay");
+
                             }
                         });
                 AlertDialog alert = builder.create();

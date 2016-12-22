@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <action android:name="android.intent.action.MAIN" />
     <application
@@ -29,5 +30,6 @@
         <activity android:name=".UserinfoActivity">
         </activity>
         <service android:name=".AlarmMessageService" android:enabled="true"></service>
+        <service android:name=".GpsInfo" android:enabled="true"></service>
     </application>
 </manifest>
