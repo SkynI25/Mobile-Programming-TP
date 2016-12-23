@@ -31,20 +31,19 @@ public class AlarmMessageService extends Service {
         super.onCreate();
 
         IntentFilter filter = new IntentFilter();
-        /*filter.addAction("anroid.intent.action.SCREEN_ON");
-        filter.addAction("anroid.intent.action.SCREEN_OFF");*/
 
         filter.addAction("com.example.insky.finalproject");
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
 
-        //filter.addAction("com.example.insky.finalproject");
         registerReceiver(mReceiver, filter);
         Log.d("onCreate()","브로드캐스트리시버 등록됨");
+
     }
 
     @Override
     public void onDestroy() {
+
         super.onDestroy();
         if(mReceiver != null)
         unregisterReceiver(mReceiver);

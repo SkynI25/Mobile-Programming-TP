@@ -22,7 +22,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="위기알림시간"
+        android:text="보호시간"
         android:onClick="onClick"
         android:textSize="10pt"
         android:id="@+id/countdown"/>

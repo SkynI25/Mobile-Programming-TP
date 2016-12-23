@@ -6,6 +6,7 @@ import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +24,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,9 +50,8 @@ public class MainActivity extends AppCompatActivity {
     PendingIntent pendingIntent;
     final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 123;
     public int TimeL;
-    double lat;
-    double lon;
-    protected LocationManager locationManager;
+    ContentResolver mCr;
+    int scrTimeout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,22 +131,50 @@ public class MainActivity extends AppCompatActivity {
         Log.v("start", "체크");
 
         Intent intent = new Intent(this, AlarmMessageService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        //bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        startService(intent);
         TimeL = Integer.parseInt(loadCT());
-        //startService(intent);
 
         Saver_number.setText(load());
-        SleepTimeST_text.setText((loadSLS()));
-        SleepTimeED_text.setText((loadSLE()));
-        CountTime_text.setText(loadCT());
+        SleepTimeST_text.setText((loadSLS()) + "분");
+        SleepTimeED_text.setText((loadSLE()) + "분");
+        CountTime_text.setText(loadCT() + "분");
 
-        am = (AlarmManager)getSystemService(ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        int Hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int Minute = calendar.get(Calendar.MINUTE);
+        int Time = Hour * 60 + Minute;
+        int scrTimeout = 60000;
+        if(System.currentTimeMillis() - 0 < 200) {
+            scrTimeout = Settings.System.getInt(mCr, Settings.System.SCREEN_OFF_TIMEOUT, 0);
+        }
+       /* am = (AlarmManager)getSystemService(ALARM_SERVICE);
 
         intent = new Intent("com.example.insky.finalproject");
         pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
-        am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 30000 * TimeL , pendingIntent);
+        am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 10000 * TimeL , pendingIntent);*/
         //am.cancel(pendingIntent);
+        /*if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+
+            Log.d("onReceive()", "꺼짐!!!");
+            if (Time >= Integer.parseInt(loadSLS()) && Integer.parseInt(loadSLE()) >= Time) {
+                return;
+            } else if (Time < Integer.parseInt(loadSLS()) && Integer.parseInt(loadSLE()) < Time && Time >= Integer.parseInt(loadCT()) + scrTimeout) {
+                am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 10000 * Integer.parseInt(loadCT()), pendingIntent);
+                intent = new Intent("com.example.insky.finalproject");
+                pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+            } else if (Integer.parseInt(loadSLS()) - Time <= Integer.parseInt(loadCT())) {
+                am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000 * (Time + Integer.parseInt(loadCT()) + Integer.parseInt(loadSLR())), pendingIntent);
+                intent = new Intent("com.example.insky.finalproject");
+                pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+            }
+
+            // 화면이 켜졌을때
+        } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+            am.cancel(pendingIntent);
+            Log.d("onReceive()", "켜짐!!!");
+        }*/
     }
 
     @Override
@@ -154,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         /*if (mBound) {
             unbindService(mConnection);
             mBound = false;
-        }*/
+        } */
     }
 
     @Override
@@ -163,15 +193,6 @@ public class MainActivity extends AppCompatActivity {
         Log.v("Pause", "체크");
     }
 
-    /*@Override
-    protected  void onResume() {
-        super.onResume();
-        Log.v("Resume", "체크");
-        if(KeyguardManager.inKeyguardRestrictedInputMode()==true) {
-
-        }
-
-    }*/
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == user) {
@@ -221,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String load() { // 파일을 한 바이트씩 읽어주는 함수
         try {
+
             FileInputStream fis = openFileInput("saverInfo.txt"); // 파일읽기 위해 파일 오픈
             byte[] data = new byte[fis.available()]; // 버퍼 생성후 읽기 수행
             fis.read(data);
@@ -261,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
             Log.v("오류발생!", "이거안되요!");
             e.printStackTrace();
         }
-        return "";
+        return "0";
     }
 
     public String loadSLE() { // 파일을 한 바이트씩 읽어주는 함수
@@ -276,25 +298,8 @@ public class MainActivity extends AppCompatActivity {
             Log.v("오류발생!", "이거안되요!");
             e.printStackTrace();
         }
-        return "";
+        return "2";
     }
-
-    public String loadTime() { // 파일을 한 바이트씩 읽어주는 함수
-//        return "1";
-        try {
-            FileInputStream fis = openFileInput("userInfoSLR.txt"); // 파일읽기 위해 파일 오픈
-            byte[] data = new byte[fis.available()]; // 버퍼 생성후 읽기 수행
-            fis.read(data);
-            Log.v("load", new String(data));
-            fis.close();
-            return new String(data);
-        } catch (Exception e) { // 예외처리. 파일 관련 API를 사용하는 경우 IOEXCEPTION을 해주어야 함
-            Log.v("오류발생!", "이거안되요!");
-            e.printStackTrace();
-        }
-        return "1";
-    }
-
 
     /*    protected void onDestroy() {
             super.onDestroy();
@@ -304,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                 ex.printStackTrace();
             } // AlarmManager 에 등록한 alarm 취소 am.cancel(pendingIntent);
         }*/
-    private ServiceConnection mConnection = new ServiceConnection() {
+    /*private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d("MainActivity", "onServiceConnected()");
@@ -318,5 +323,19 @@ public class MainActivity extends AppCompatActivity {
             Log.d("MainActivity", "onServiceDisconnected()");
             mBound = false;
         }
-    };
+    };*/
+    public String loadSLR() { // 파일을 한 바이트씩 읽어주는 함수
+        try {
+            FileInputStream fis = openFileInput("userInfoSLR.txt"); // 파일읽기 위해 파일 오픈
+            byte[] data = new byte[fis.available()]; // 버퍼 생성후 읽기 수행
+            fis.read(data);
+            Log.v("load", new String(data));
+            fis.close();
+            return new String(data);
+        } catch (Exception e) { // 예외처리. 파일 관련 API를 사용하는 경우 IOEXCEPTION을 해주어야 함
+            Log.v("error!", "이거안되요!");
+            e.printStackTrace();
+        }
+        return "480";
+    }
 }

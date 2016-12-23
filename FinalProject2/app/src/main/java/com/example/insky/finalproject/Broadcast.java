@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -11,6 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -30,40 +32,26 @@ import static android.content.Context.ALARM_SERVICE;
 public class Broadcast extends BroadcastReceiver {
     Context mContext;
     double x,y;
+    AlarmManager am;
+    PendingIntent pendingIntent;
+    ContentResolver mCr;
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext = context;
 
         AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         Calendar calendar = Calendar.getInstance();
         int Hour = calendar.get(Calendar.HOUR_OF_DAY);
         int Minute = calendar.get(Calendar.MINUTE);
         int Time = Hour * 60 + Minute;
-
-        // 시간이 흘렀을때
-        if (intent.getAction().equals("com.example.insky.finalproject")) {
-            //am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000 * Integer.parseInt(loadCT()) , pendingIntent);
-            if (Time >= Integer.parseInt(loadSLS()) && Integer.parseInt(loadSLE()) >= Time) {
-                return;
-            } else if (Time >= Integer.parseInt(loadSLE())) {
-                am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 30000 * Integer.parseInt(loadCT()), pendingIntent);
-            }
-
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(load(), null, loadCT() + " 분 동안 사용자가 핸드폰을 사용하지 않았습니다!", null, null);
-            Toast.makeText(context, "HERE", Toast.LENGTH_SHORT).show();
-            Log.d("onReceive()", "알람 받음");
+        int scrTimeout = 60000;
+        if(System.currentTimeMillis() - 0 < 200) {
+            scrTimeout = Settings.System.getInt(mCr, Settings.System.SCREEN_OFF_TIMEOUT, 0);
         }
-
-/*
-            Date date = new Date();
-            Calendar...
-            if (cal.getTime() <=...<=)
-            return;
-*/
 
             //Log.d("onReceive()", "알람 받음");
 //            Log.d("onReceive()", "스크린 OFF");
@@ -113,15 +101,39 @@ public class Broadcast extends BroadcastReceiver {
 //        }
 
             // 화면이 꺼졌을때
-        else if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+        if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+
+            Log.d("onReceive()", "꺼짐!!!");
             if(Time >= Integer.parseInt(loadSLS()) && Integer.parseInt(loadSLE()) >= Time ) {
                 return;
-            }
-            intent = new Intent("com.example.insky.finalproject");
-            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-            am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 30000 * Integer.parseInt(loadCT()) , pendingIntent);
-            Log.d("onReceive()", "꺼짐!!!");
+            } else if (Time < Integer.parseInt(loadSLS()) && Integer.parseInt(loadSLE()) < Time && Time >= Integer.parseInt(loadCT()) + scrTimeout) {
+                intent = new Intent("com.example.insky.finalproject");
+                pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+                am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000 * Integer.parseInt(loadCT()), pendingIntent);
 
+                // 시간이 흘렀을때
+                if (intent.getAction().equals("com.example.insky.finalproject")) {
+                    //am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000 * Integer.parseInt(loadCT()) , pendingIntent);
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(load(), null, loadCT() + " 분 동안 사용자가 핸드폰을 사용하지 않았습니다!", null, null);
+                    Toast.makeText(context, "HERE", Toast.LENGTH_SHORT).show();
+                    Log.d("onReceive()", "알람 받음");
+                }
+            } else if(Integer.parseInt(loadSLS()) - Time <= Integer.parseInt(loadCT())) {
+
+                intent = new Intent("com.example.insky.finalproject");
+                pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+                am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000 * (Time + Integer.parseInt(loadCT()) + Integer.parseInt(loadSLR())), pendingIntent);
+
+                // 시간이 흘렀을때
+                if (intent.getAction().equals("com.example.insky.finalproject")) {
+                    //am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000 * Integer.parseInt(loadCT()) , pendingIntent);
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(load(), null, loadCT() + " 분 동안 사용자가 핸드폰을 사용하지 않았습니다!", null, null);
+                    Toast.makeText(context, "HERE", Toast.LENGTH_SHORT).show();
+                    Log.d("onReceive()", "알람 받음");
+                }
+            }
             // 화면이 켜졌을때
         } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
             am.cancel(pendingIntent);
@@ -138,7 +150,7 @@ public class Broadcast extends BroadcastReceiver {
             fis.close();
             return new String(data);
         } catch (Exception e) { // 예외처리. 파일 관련 API를 사용하는 경우 IOEXCEPTION을 해주어야 함
-            Log.v("오류발생!", "이거안되요!");
+            Log.v("error!", "이거안되요!");
             e.printStackTrace();
         }
         return "01094014406";
@@ -153,7 +165,7 @@ public class Broadcast extends BroadcastReceiver {
             fis.close();
             return new String(data);
         } catch (Exception e) { // 예외처리. 파일 관련 API를 사용하는 경우 IOEXCEPTION을 해주어야 함
-            Log.v("오류발생!", "이거안되요!");
+            Log.v("error!", "이거안되요!");
             e.printStackTrace();
         }
         return "1";
@@ -168,7 +180,7 @@ public class Broadcast extends BroadcastReceiver {
             fis.close();
             return new String(data);
         } catch (Exception e) { // 예외처리. 파일 관련 API를 사용하는 경우 IOEXCEPTION을 해주어야 함
-            Log.v("오류발생!", "이거안되요!");
+            Log.v("error!", "이거안되요!");
             e.printStackTrace();
         }
         return "0";
@@ -183,10 +195,25 @@ public class Broadcast extends BroadcastReceiver {
             fis.close();
             return new String(data);
         } catch (Exception e) { // 예외처리. 파일 관련 API를 사용하는 경우 IOEXCEPTION을 해주어야 함
-            Log.v("오류발생!", "이거안되요!");
+            Log.v("error!", "이거안되요!");
             e.printStackTrace();
         }
         return "8";
+    }
+
+    public String loadSLR() { // 파일을 한 바이트씩 읽어주는 함수
+        try {
+            FileInputStream fis = mContext.openFileInput("userInfoSLR.txt"); // 파일읽기 위해 파일 오픈
+            byte[] data = new byte[fis.available()]; // 버퍼 생성후 읽기 수행
+            fis.read(data);
+            Log.v("load", new String(data));
+            fis.close();
+            return new String(data);
+        } catch (Exception e) { // 예외처리. 파일 관련 API를 사용하는 경우 IOEXCEPTION을 해주어야 함
+            Log.v("error!", "이거안되요!");
+            e.printStackTrace();
+        }
+        return "480";
     }
 
 }
